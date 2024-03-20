@@ -50,16 +50,13 @@ Short description or tagline of the project.
         --> cd KrishiMitra---Crop-Finder 
 
 - 2>Set up the MySQL database:
-
-         -->Open MySQL Workbench and import the database provided in SQL format (krishimitra.sql) to set up the database.
+-->Open MySQL Workbench and import the database provided in SQL format (krishimitra.sql) to set up the database.
 
 - 3>Modify the database configuration:
-
-         -->Open the config.py file and update the MySQL database configuration according to your setup.
+-->Open the config.py file and update the MySQL database configuration according to your setup.
 
 - 4>Run the application:
-
-        -->python main.py
+-->python main.py
 
 - 5>Open your web browser and navigate to http://localhost:5000 to access the application.
 

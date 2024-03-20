@@ -28,9 +28,10 @@ Short description or tagline of the project.
 ## Features
 
 - Database management system 
-- --> html, css, javascript in frontend
-- --> flask is used for backend
-- --> MySQL Workbench is used for database
+- --> html, css, javascript is used in frontend
+- --> flask is used for backend routing
+- --> flask-mysqldb is used for connecting with the MySQL
+- --> MySQL is used for database storage
 
 
 ## Installation

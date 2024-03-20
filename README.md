@@ -72,9 +72,8 @@ Short description or tagline of the project.
 - 5> Create a new Pull Request.
 
 -Contributors:
-
-        NamishM7 -- https://github.com/NamishM7,
-        KushalNagMS -- https://github.com/KushalNagMS
+    NamishM7 -- https://github.com/NamishM7,
+    KushalNagMS -- https://github.com/KushalNagMS
 
 
 ## License

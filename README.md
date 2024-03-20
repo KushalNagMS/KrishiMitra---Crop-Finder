@@ -27,47 +27,47 @@ Short description or tagline of the project.
 
 ## Features
 
-Database management system 
-->html, css, javascript in frontend
-->flask is used for backend
--> MySQL Workbench is used for database
+- Database management system 
+- --> html, css, javascript in frontend
+- --> flask is used for backend
+- --> MySQL Workbench is used for database
 
 
 ## Installation
 
--Install_following_python_libraries
-    -->pip install flask
-    -->pip install flask-mysqldb
-    -->pip install reportlab
+- Install_following_python_libraries
+- --> pip install flask
+- --> pip install flask-mysqldb
+- --> pip install reportlab
 
 ## Usage
 
-To use the KrishiMitra - Crop Finder system, follow these steps:
+- To use the KrishiMitra - Crop Finder system, follow these steps:
 
-    1>Clone the repository:
+- 1>Clone the repository:
         --> git clone https://github.com/your_username/KrishiMitra---Crop-Finder.git
         --> cd KrishiMitra---Crop-Finder 
 
-    2>Set up the MySQL database:
+- 2>Set up the MySQL database:
          -->Create a MySQL database and import the provided SQL file (database.sql) to set up the required tables.
 
-    3>Modify the database configuration:
+- 3>Modify the database configuration:
          -->Open the config.py file and update the MySQL database configuration according to your setup.
 
-    4>Run the application:
+- 4>Run the application:
         -->python main.py
 
-    5>Open your web browser and navigate to http://localhost:5000 to access the application.
+- 5>Open your web browser and navigate to http://localhost:5000 to access the application.
 
 
 ## Contributing
 
- If you're interested in contributing to this project, please follow these guidelines:
-    1>Fork the repository.
-    2>Create a new branch for your feature (git checkout -b feature-name).
-    3>Commit your changes (git commit -am 'Add new feature').
-    4>Push to the branch (git push origin feature-name).
-    5>Create a new Pull Request.
+- If you're interested in contributing to this project, please follow these guidelines:
+- 1> Fork the repository.
+- 2> Create a new branch for your feature (git checkout -b feature-name).
+- 3> Commit your changes (git commit -am 'Add new feature').
+- 4> Push to the branch (git push origin feature-name).
+- 5> Create a new Pull Request.
 
     Contributors:
         NamishM7 -- https://github.com/NamishM7,
@@ -76,7 +76,7 @@ To use the KrishiMitra - Crop Finder system, follow these steps:
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+- This project is licensed under the MIT License - see the LICENSE.md file for details.
 
 
 

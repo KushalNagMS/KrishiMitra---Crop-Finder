@@ -8,6 +8,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Ima
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 
+
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 mysql = MySQL(app)
@@ -23,25 +24,30 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
-        user = cur.fetchone()
-        cur.execute("SELECT * FROM _admin_ WHERE admminname = %s AND adminpassword = %s", (username, password))
-        admin = cur.fetchone()
-        cur.close()
-        if user:
-            session['username'] = username
-            return redirect(url_for('dashboard'))
-        elif admin:
-            mysql_workbench_path = 'C:\Program Files\MySQL\MySQL Workbench 8.0\MySQLWorkbench.exe'
-            subprocess.Popen([mysql_workbench_path])
-            return """
-                    <script type="text/javascript">
-                        window.close();
-                    </script>
-                """
-        else :
-            alert_message="Invalid Login Credentials"
+        try:
+            cur = mysql.connection.cursor()
+            cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+            user = cur.fetchone()
+            cur.execute("SELECT * FROM _admin_ WHERE admminname = %s AND adminpassword = %s", (username, password))
+            admin = cur.fetchone()
+            cur.close()
+            if user:
+                session['username'] = username
+                return redirect(url_for('dashboard'))
+            elif admin:
+                mysql_workbench_path = 'C:\Program Files\MySQL\MySQL Workbench 8.0\MySQLWorkbench.exe'
+                subprocess.Popen([mysql_workbench_path])
+                return """
+                        <script type="text/javascript">
+                            window.close();
+                        </script>
+                    """
+            else :
+                alert_message="Invalid Login Credentials"
+                return render_template('login.html', alert_message=alert_message)
+        except AttributeError as e:
+            # Handle AttributeError here, for example, by logging the error
+            alert_message = "DataBase Connection is not established"
             return render_template('login.html', alert_message=alert_message)
     return render_template('login.html')
 
@@ -571,22 +577,26 @@ def contact():
 @app.route('/signup',methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-        cur = mysql.connection.cursor()
-        cur.execute("SELECT * FROM users WHERE username = %s", (username,))
-        existing_user = cur.fetchone()
-        if existing_user:
-            error = 'Username already exists'
+        try:
+            username = request.form['username']
+            email = request.form['email']
+            password = request.form['password']
+            cur = mysql.connection.cursor()
+            cur.execute("SELECT * FROM users WHERE username = %s", (username,))
+            existing_user = cur.fetchone()
+            if existing_user:
+                error = 'Username already exists'
+                return render_template('signup.html', error=error)
+            else :
+                cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, password))
+                mysql.connection.commit()
+                cur.close()
+                erro = 'User Created'
+                return render_template('signup.html', erro=erro)
+        except AttributeError as e:
+            # Display an error message
+            error = "Database connection is not established"
             return render_template('signup.html', error=error)
-        else :
-            cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, password))
-            mysql.connection.commit()
-            cur.close()
-            session['username'] = username
-            erro = 'User Created'
-            return render_template('login.html', erro=erro)
     return render_template('signup.html')
 
 

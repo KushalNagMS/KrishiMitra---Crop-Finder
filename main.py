@@ -74,6 +74,7 @@ def user():
     cur.close()
     return render_template('user.html')
 
+
 @app.route('/update_user', methods=['POST'])
 def update_user():
     if 'username' in session:
@@ -101,8 +102,6 @@ def update_user():
             cur.close()
             alert='Username already exists. Please choose a different username.'
             return render_template('user.html', alert=alert)  # Redirect back to the user page
-
-
 
 
 @app.route('/submit_form', methods=['POST'])

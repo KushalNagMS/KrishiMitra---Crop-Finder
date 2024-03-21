@@ -1,5 +1,5 @@
 from flask_mysqldb import MySQL
-from flask import Flask, render_template, redirect, url_for,request,session, jsonify, make_response, Response
+from flask import Flask, render_template, redirect, url_for,request,session, jsonify, make_response, Response, flash
 import uuid
 import subprocess
 from reportlab.lib import colors
@@ -63,6 +63,46 @@ def dashboard():
         return render_template('dashboard.html', username=data[0])  # Pass username to the template
     else:
         return redirect(url_for('login'))
+
+
+@app.route('/user', methods=['GET'])
+def user():
+    username = session['username']
+    cur = mysql.connection.cursor()
+    cur.execute("SELECT * FROM users WHERE username = %s", (username,))
+    user = cur.fetchone()
+    cur.close()
+    return render_template('user.html')
+
+@app.route('/update_user', methods=['POST'])
+def update_user():
+    if 'username' in session:
+        username = session['username']
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
+        data = cursor.fetchone()
+        new_username = request.form['username']
+        new_email = request.form['email']
+        new_password = request.form['password']
+
+        cur = mysql.connection.cursor()
+        # Check if the new username already exists
+        cur.execute("SELECT username FROM users WHERE username = %s", (new_username,))
+        existing_user = cur.fetchone()
+        
+        if existing_user == None :
+            cur.execute("UPDATE users SET username = %s, password = %s, email = %s WHERE username = %s", (new_username, new_email, new_password, session['username']))
+            mysql.connection.commit()
+            cur.close()
+            session['username'] = new_username  # Update session with new username
+            alert='User information updated successfully.'
+            return render_template('user.html', alert=alert)
+        elif new_username == existing_user[0]:
+            cur.close()
+            alert='Username already exists. Please choose a different username.'
+            return render_template('user.html', alert=alert)  # Redirect back to the user page
+
+
 
 
 @app.route('/submit_form', methods=['POST'])

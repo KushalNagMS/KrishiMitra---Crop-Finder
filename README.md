@@ -40,6 +40,7 @@ Short description or tagline of the project.
 - --> pip install flask
 - --> pip install flask-mysqldb
 - --> pip install reportlab
+- MySQL Workbench of 8.0 and above version is supported for data import
 
 ## Usage
 

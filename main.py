@@ -7,11 +7,25 @@ from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Image, Paragraph, PageTemplate, Frame
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
+from mysql.connector import connect
 
 
 app = Flask(__name__)
-app.config.from_pyfile('config.py')
-mysql = MySQL(app)
+app.secret_key = 'your_secret_key_here'
+app.config['MYSQL_HOST'] = 'localhost'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'root'
+app.config['MYSQL_DB'] = 'krishimitra'
+
+
+# Function to get MySQL connection
+def get_mysql_connection():
+    return connect(
+        host=app.config['MYSQL_HOST'],
+        user=app.config['MYSQL_USER'],
+        password=app.config['MYSQL_PASSWORD'],
+        database=app.config['MYSQL_DB']
+    )
 
 
 @app.route('/')
@@ -25,12 +39,14 @@ def login():
         username = request.form['username']
         password = request.form['password']
         try:
-            cur = mysql.connection.cursor()
+            connection = get_mysql_connection()
+            cur = connection.cursor()
             cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
             user = cur.fetchone()
             cur.execute("SELECT * FROM _admin_ WHERE admminname = %s AND adminpassword = %s", (username, password))
             admin = cur.fetchone()
             cur.close()
+            connection.close()
             if user:
                 session['username'] = username
                 return redirect(url_for('dashboard'))
@@ -56,10 +72,12 @@ def login():
 def dashboard():
     if 'username' in session:
         username = session['username']
-        cursor = mysql.connection.cursor()
+        connection = get_mysql_connection()
+        cursor = connection.cursor()
         cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
         data = cursor.fetchone()
         cursor.close()
+        connection.close()
         return render_template('dashboard.html', username=data[0])  # Pass username to the template
     else:
         return redirect(url_for('login'))
@@ -68,10 +86,12 @@ def dashboard():
 @app.route('/user', methods=['GET'])
 def user():
     username = session['username']
-    cur = mysql.connection.cursor()
+    connection = get_mysql_connection()
+    cur = connection.cursor()
     cur.execute("SELECT * FROM users WHERE username = %s", (username,))
     user = cur.fetchone()
     cur.close()
+    connection.close()
     return render_template('user.html')
 
 
@@ -79,27 +99,32 @@ def user():
 def update_user():
     if 'username' in session:
         username = session['username']
-        cursor = mysql.connection.cursor()
+        connection = get_mysql_connection()
+        cursor = connection.cursor()
         cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
         data = cursor.fetchone()
         new_username = request.form['username']
         new_email = request.form['email']
         new_password = request.form['password']
-
-        cur = mysql.connection.cursor()
+        cursor.close()
+        connection.close()
+        connection = get_mysql_connection()
+        cur = connection.cursor()
         # Check if the new username already exists
         cur.execute("SELECT username FROM users WHERE username = %s", (new_username,))
         existing_user = cur.fetchone()
         
         if existing_user == None :
-            cur.execute("UPDATE users SET username = %s, password = %s, email = %s WHERE username = %s", (new_username, new_email, new_password, session['username']))
-            mysql.connection.commit()
+            cur.execute("UPDATE users SET username = %s, password = %s, email = %s WHERE username = %s", (new_username, new_password, new_email, session['username']))
+            connection.commit()
             cur.close()
+            connection.close()
             session['username'] = new_username  # Update session with new username
             alert='User information updated successfully.'
             return render_template('user.html', alert=alert)
         elif new_username == existing_user[0]:
             cur.close()
+            connection.close()
             alert='Username already exists. Please choose a different username.'
             return render_template('user.html', alert=alert)  # Redirect back to the user page
 
@@ -109,23 +134,27 @@ def submit_form():
     if request.method == 'POST':
         session_id = str(uuid.uuid4())
         record_name = request.form.get('recordName')
-        cursor = mysql.connection.cursor()
+        connection = get_mysql_connection()
+        cursor = connection.cursor()
         username = session['username']
         cursor.execute("SELECT username FROM users WHERE username = %s", (username,))
-        data = cursor.fetchone()
+        data = cursor.fetchone()[0]
         cursor.execute("INSERT INTO user_records (session_id, username,record_name) VALUES (%s, %s, %s)", (session_id, data, record_name))
-        mysql.connection.commit()
+        connection.commit()
         cursor.close()
+        connection.close()
         session['session_id'] = session_id
         return redirect(url_for('region'))
 
 
 @app.route('/region')
 def region(): 
-    cursor = mysql.connection.cursor()
+    connection = get_mysql_connection()
+    cursor = connection.cursor()
     cursor.execute("SELECT region_name FROM region")
     regions = cursor.fetchall()
     cursor.close()
+    connection.close()
     region_names = [region[0] for region in regions]
     return render_template('region.html', regions=region_names)
 
@@ -136,23 +165,27 @@ def get_region():
     region_name = request.args.get('regionName')
     if not region_name:
         return jsonify({'success': False, 'message': 'Please select a region.'})
-    cursor = mysql.connection.cursor()
+    connection = get_mysql_connection()
+    cursor = connection.cursor()
     cursor.execute("UPDATE user_records SET region = %s WHERE session_id = %s", (region_name, session_id))
-    mysql.connection.commit()
+    connection.commit()
     cursor.close()
+    connection.close()
     return "Region '{}' stored successfully in the database.".format(region_name)
 
 
 @app.route('/soil')
 def soil():
     session_id = session['session_id'] 
-    cursor = mysql.connection.cursor()
+    connection = get_mysql_connection()
+    cursor = connection.cursor()
     cursor.execute("SELECT soil_type FROM region_soil WHERE region_name IN (SELECT region FROM user_records WHERE session_id = %s)", (session_id,))
-    soil_data = cursor.fetchall()
+    soil_data = cursor.fetchone()[(0)]
+    print(soil_data[0])
     cursor.execute("SELECT region_name FROM region_soil WHERE region_name IN (SELECT region FROM user_records WHERE session_id = %s)", (session_id,))
-    region_data = cursor.fetchall()
+    region_data = cursor.fetchone()[(0)]
     cursor.execute("UPDATE user_records SET soil = %s WHERE session_id = %s", (soil_data, session_id))
-    mysql.connection.commit()
+    connection.commit()
     cursor.execute("SELECT cost_per_unit_area FROM region WHERE region_name = %s", (region_data,))
     cost_data = cursor.fetchall()
     cursor.execute("SELECT water_source FROM region_water WHERE region_name = %s", (region_data,))
@@ -162,38 +195,44 @@ def soil():
     cursor.execute("SELECT water_holding_capacity FROM soil WHERE soil_type = %s", (soil_data,))
     water_cap = cursor.fetchall()
     cursor.close()
-    return render_template('soil.html', soil_data=soil_data[0],region_data=region_data[0],cost_data=cost_data[0],water_data=water_data[0],water=water_data[1], soil1=nutrients_data[0],soil2=nutrients_data[1],soil3=nutrients_data[2],water_cap=water_cap[0])
+    connection.close()
+    return render_template('soil.html', soil_data=soil_data,region_data=region_data,cost_data=cost_data[0],water_data=water_data[0],water=water_data[1], soil1=nutrients_data[0],soil2=nutrients_data[1], soil3=nutrients_data[2],water_cap=water_cap[0])
 
 
 @app.route('/store_month', methods=['POST'])
 def store_month():
     session_id = session['session_id'] 
     selected_month = request.form['month']
-    cursor = mysql.connection.cursor()
+    connection = get_mysql_connection()
+    cursor = connection.cursor()
     cursor.execute("UPDATE user_records SET month_ = %s WHERE session_id = %s", (selected_month, session_id))
-    mysql.connection.commit()
+    connection.commit()
     cursor.close()
+    connection.close()
     return "Month '{}' stored successfully in the database.".format(selected_month)
 
 
 @app.route('/crop_search')
 def crop_search():
         session_id = session['session_id'] 
-        cursor = mysql.connection.cursor()
+        connection = get_mysql_connection()
+        cursor = connection.cursor()
         cursor.execute("SELECT crop_name FROM crop_all_month WHERE (sowing_month, soil_type) IN (SELECT month_, soil FROM user_records WHERE session_id = %s)", (session_id,))
-        crop_name = cursor.fetchall()
+        crop_name = cursor.fetchone()[(0)]
         cursor.execute("UPDATE user_records SET crop = %s WHERE session_id = %s ", (crop_name, session_id,))
-        mysql.connection.commit()
+        connection.commit()
         cursor.execute("SELECT * FROM crop_properties WHERE crop_name = %s", (crop_name,))
         crop_prop = cursor.fetchall()
         cursor.close()
-        return render_template('crop_search.html', crop_name=crop_name[0], crop_prop=crop_prop)
+        connection.close()
+        return render_template('crop_search.html', crop_name=crop_name, crop_prop=crop_prop)
 
 
 @app.route('/crop')
 def crop():
     session_id = session['session_id'] 
-    cursor = mysql.connection.cursor()
+    connection = get_mysql_connection()
+    cursor = connection.cursor()
     cursor.execute("SELECT crop FROM user_records WHERE session_id = %s", (session_id,))
     crop = cursor.fetchone()
     if crop:
@@ -209,6 +248,7 @@ def crop():
         cursor.execute("SELECT medicine FROM crop_medicines WHERE diseases IN (SELECT diseases FROM crop_diseases WHERE crop_name = %s)", (crop,))
         crop_med = cursor.fetchall()
         cursor.close()
+        connection.close()
         return render_template('crop.html', crop=crop, crop_dis=crop_dis, crop_pro=crop_pro, crop_eco=crop_eco,
                                 crop_pes=crop_pes,crop_med=crop_med[0])
     
@@ -216,10 +256,12 @@ def crop():
 @app.route('/report')
 def report():
     username = session['username'] 
-    cursor = mysql.connection.cursor()
+    connection = get_mysql_connection()
+    cursor = connection.cursor()
     cursor.execute("SELECT * FROM user_records where username = %s", (username,))
     data = cursor.fetchall()
     cursor.close()
+    connection.close()
     return render_template('report.html',data=data)
 
 
@@ -229,11 +271,13 @@ def update_record():
     record_id = request.form['record_id']
     try:
         # Update record name in the database
-        cursor = mysql.connection.cursor()
+        connection = get_mysql_connection()
+        cursor = connection.cursor()
         query = "UPDATE user_records SET record_name = %s WHERE session_id = %s"
         cursor.execute(query, (new_name, record_id))
-        mysql.connection.commit()
+        connection.commit()
         cursor.close()
+        connection.close()
         return redirect(url_for('report'))
     except Exception as e:
         return "Error updating record name: " + str(e)
@@ -244,10 +288,12 @@ def delete_record():
     delete_id = request.form['delete_id']
     try:
         # Update record name in the database
-        cursor = mysql.connection.cursor()
+        connection = get_mysql_connection()
+        cursor = connection.cursor()
         cursor.execute("DELETE FROM user_records WHERE session_id = %s",(delete_id,))
-        mysql.connection.commit()
+        connection.commit()
         cursor.close()
+        connection.close()
         return redirect(url_for('report'))
     except Exception as e:
         return "Error updating record name: " + str(e)
@@ -290,23 +336,17 @@ def generate_pdf(crop,crop_dis,crop_pro,crop_eco,crop_pes,crop_med,soil_data,reg
 
     elements.append(Spacer(1, 20))
 
-    for row in region_data:
-        r=row[0]
-
-    for row in soil_data:
-        s=row[0]
-
-    region_pic = f"static/region/{r}.jpg"
+    region_pic = f"static/region/{region_data}.jpg"
     region_img = Image(region_pic, width=2*inch, height=1.5*inch)
 
-    soil_pic = f"static/soil/{s}.jpg"
+    soil_pic = f"static/soil/{soil_data}.jpg"
     soil_img = Image(soil_pic, width=2*inch, height=1.5*inch)
 
     pic_path = f"static/crop_search/{crop}.jpg"
 
     crop_img = Image(pic_path, width=2*inch, height=1.5*inch)
 
-    pics = [["Region","Soil","Crop"],[r, s, crop],[None,None,None]]
+    pics = [["Region","Soil","Crop"],[region_data, soil_data, crop],[None,None,None]]
 
     pics[2][0] = region_img 
     pics[2][1] = soil_img 
@@ -561,10 +601,11 @@ def download_pdf():
 
     # Fetch PDF content from MySQL based on session_id
     try:
-        cursor = mysql.connection.cursor()
+        connection = get_mysql_connection()
+        cursor = connection.cursor()
         cursor.execute("SELECT crop FROM user_records WHERE session_id = %s", (session_id,))
         crop = cursor.fetchone()[0]
-    except mysql.connector.Error as error:
+    except connection.Error as error:
         print("Error fetching PDF content:", error)
         return "Error fetching PDF content"
     cursor.execute("SELECT * FROM crop_diseases WHERE crop_name = %s", (crop,))
@@ -578,11 +619,9 @@ def download_pdf():
     cursor.execute("SELECT medicine FROM crop_medicines WHERE diseases IN (SELECT diseases FROM crop_diseases WHERE crop_name = %s)", (crop,))
     crop_med = cursor.fetchall()
     cursor.execute("SELECT soil_type FROM region_soil WHERE region_name IN (SELECT region FROM user_records WHERE session_id = %s)", (session_id,))
-    soil_data = cursor.fetchall()
+    soil_data = cursor.fetchone()[(0)]
     cursor.execute("SELECT region_name FROM region_soil WHERE region_name IN (SELECT region FROM user_records WHERE session_id = %s)", (session_id,))
-    region_data = cursor.fetchall()
-    cursor.execute("UPDATE user_records SET soil = %s WHERE session_id = %s", (soil_data, session_id))
-    mysql.connection.commit()
+    region_data = cursor.fetchone()[(0)]
     cursor.execute("SELECT cost_per_unit_area FROM region WHERE region_name = %s", (region_data,))
     cost_data = cursor.fetchall()
     cursor.execute("SELECT water_source FROM region_water WHERE region_name = %s", (region_data,))
@@ -598,6 +637,7 @@ def download_pdf():
     cursor.execute("SELECT month_ FROM user_records WHERE session_id = %s", (session_id,))
     month = cursor.fetchone()[0]
     cursor.close()
+    connection.close()
     filename = generate_pdf(crop,crop_dis,crop_pro,crop_eco,crop_pes,crop_med,soil_data,region_data,cost_data,water_data,nutrients_data,water_cap,user,record_name,month)
     return Response(open(filename, 'rb'), mimetype='application/pdf', headers={'Content-Disposition': 'attachment; filename=KrishiMitra.pdf'})
 
@@ -620,7 +660,8 @@ def signup():
             username = request.form['username']
             email = request.form['email']
             password = request.form['password']
-            cur = mysql.connection.cursor()
+            connection = get_mysql_connection()
+            cur = connection.cursor()
             cur.execute("SELECT * FROM users WHERE username = %s", (username,))
             existing_user = cur.fetchone()
             if existing_user:
@@ -628,8 +669,9 @@ def signup():
                 return render_template('signup.html', error=error)
             else :
                 cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, password))
-                mysql.connection.commit()
+                connection.commit()
                 cur.close()
+                connection.close()
                 erro = 'User Created'
                 return render_template('signup.html', erro=erro)
         except AttributeError as e:

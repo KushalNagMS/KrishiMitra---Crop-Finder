@@ -41,10 +41,10 @@
         <div class="right_content">
             <div class="item1">
 
-                <h1 style="text-align: center;font-size: 2.5rem;"> {% for row in crop_name %}
+                <h1 style="text-align: center;font-size: 2.5rem;">
                     <tr>
-                        <td>{{ row }}</td>
-                    </tr>{% endfor %}
+                        <td>{{ crop_name }}</td>
+                    </tr>
                 </h1>
                 <br>
                 <br>
@@ -67,7 +67,7 @@
 
             <div class="item3">
                 <img style="width: 300px;
-                height: 400px; border-radius: 20px;" src="{{ url_for('static', filename='crop_search/'+ crop_name[0] +'.jpg') }}">
+                height: 400px; border-radius: 20px;" src="{{ url_for('static', filename='crop_search/'+ crop_name +'.jpg') }}">
             </div>
 
 

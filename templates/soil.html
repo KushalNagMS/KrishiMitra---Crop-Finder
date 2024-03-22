@@ -49,19 +49,17 @@
             </div>
             <div style="height: 35vh;" class="d soil_info">
                 <div class="info">
-                    <h1 style="text-align: center;font-size: 1.5 rem;  margin-top: 25px;">Region : {% for ro in
-                        region_data %}
+                    <h1 style="text-align: center;font-size: 1.5 rem;  margin-top: 25px;">Region : 
                         <tr>
-                            <td>{{ ro }}</td>
-                        </tr>{% endfor %}
+                            <td>{{ region_data }}</td>
+                        </tr>
                     </h1>
                 </div>
                 <div class="info">
-                    <h2 style="text-align: center;font-size: 1 rem; margin-top: 20px;">Soil: {% for row in soil_data %}
+                    <h2 style="text-align: center;font-size: 1 rem; margin-top: 20px;">Soil: 
                         <tr>
-                            <td>{{ row }}</td>
+                            <td>{{ soil_data }}</td>
                         </tr>
-                        {% endfor %}
                     </h2>
                 </div>
                 <!-- <div class="info" style="margin-bottom: 5px;"><button aria-placeholder="Select"></button></div> -->
@@ -126,11 +124,11 @@
                     <div class="wrapper1">
                         <div class="image">
                             <img style="width: 450px; height: 300px; display: block; border-radius: 20px;"
-                                src="{{ url_for ('static',filename='soil/'+ soil_data[0] +'.jpg') }}" alt="">
+                                src="{{ url_for ('static',filename='soil/'+ soil_data +'.jpg') }}" alt="">
                             <div style="width: 450px; 
                             height: 300px;" class="content">
                                 <h1>
-                                    {{ soil_data[0] }}
+                                    {{ soil_data }}
                                 </h1>
 
                             </div>

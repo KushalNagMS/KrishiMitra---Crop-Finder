@@ -8,6 +8,7 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Ima
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from mysql.connector import connect
+import hashlib
 
 
 app = Flask(__name__)
@@ -38,10 +39,11 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
         try:
             connection = get_mysql_connection()
             cur = connection.cursor()
-            cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+            cur.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, hashed_password))
             user = cur.fetchone()
             cur.execute("SELECT * FROM _admin_ WHERE admminname = %s AND adminpassword = %s", (username, password))
             admin = cur.fetchone()
@@ -106,6 +108,7 @@ def update_user():
         new_username = request.form['username']
         new_email = request.form['email']
         new_password = request.form['password']
+        hashed_password = hashlib.sha256(new_password.encode()).hexdigest()
         cursor.close()
         connection.close()
         connection = get_mysql_connection()
@@ -115,7 +118,8 @@ def update_user():
         existing_user = cur.fetchone()
         
         if existing_user == None :
-            cur.execute("UPDATE users SET username = %s, password = %s, email = %s WHERE username = %s", (new_username, new_password, new_email, session['username']))
+            cur.execute("UPDATE users SET username = %s, password = %s, email = %s WHERE username = %s", (new_username, hashed_password, new_email, session['username']))
+            cur.execute("UPDATE user_records SET username = %s WHERE username = %s", (new_username, session['username']))
             connection.commit()
             cur.close()
             connection.close()
@@ -677,6 +681,7 @@ def signup():
             username = request.form['username']
             email = request.form['email']
             password = request.form['password']
+            hashed_password = hashlib.sha256(password.encode()).hexdigest()
             connection = get_mysql_connection()
             cur = connection.cursor()
             cur.execute("SELECT * FROM users WHERE username = %s", (username,))
@@ -685,7 +690,7 @@ def signup():
                 error = 'Username already exists'
                 return render_template('signup.html', error=error)
             else :
-                cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, password))
+                cur.execute("INSERT INTO users (username, email, password) VALUES (%s, %s, %s)", (username, email, hashed_password))
                 connection.commit()
                 cur.close()
                 connection.close()

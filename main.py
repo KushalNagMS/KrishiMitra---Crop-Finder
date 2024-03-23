@@ -1,10 +1,9 @@
-from flask_mysqldb import MySQL
-from flask import Flask, render_template, redirect, url_for,request,session, jsonify, make_response, Response, flash
+from flask import Flask, render_template, redirect, url_for,request,session, jsonify, Response
 import uuid
 import subprocess
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Image, Paragraph, PageTemplate, Frame,BaseDocTemplate
+from reportlab.platypus import Table, TableStyle, Spacer, Image, Paragraph, PageTemplate, Frame,BaseDocTemplate
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from mysql.connector import connect

@@ -4,7 +4,7 @@ import uuid
 import subprocess
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Image, Paragraph, PageTemplate, Frame
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Spacer, Image, Paragraph, PageTemplate, Frame,BaseDocTemplate
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 from mysql.connector import connect
@@ -299,10 +299,25 @@ def delete_record():
         return "Error updating record name: " + str(e)
 
 
+def add_border(canvas, doc):
+    # Draw border on every page
+    canvas.saveState()
+    canvas.setStrokeColor(colors.green)
+    canvas.setLineWidth(2)
+    canvas.rect(40, 40, doc.width + 60, doc.height + 60)
+    canvas.restoreState()
+
+class BorderedDocTemplate(BaseDocTemplate):
+    def __init__(self, filename, **kwargs):
+        BaseDocTemplate.__init__(self, filename, **kwargs)
+        self.addPageTemplates(PageTemplate(id='border', frames=Frame(40, 40, self.width+60, self.height+60), onPage=add_border))
+
+
 def generate_pdf(crop,crop_dis,crop_pro,crop_eco,crop_pes,crop_med,soil_data,region_data,cost_data,water_data,nutrients_data,water_cap,user,record_name,month):
     filename = f"{crop}.pdf"
     
-    doc = SimpleDocTemplate(filename, pagesize=letter, leftMargin=72, rightMargin=72, topMargin=72, bottomMargin=72)
+    doc = BorderedDocTemplate(filename, pagesize=letter)
+
     elements = []
 
     # Add title to PDF
@@ -443,6 +458,8 @@ def generate_pdf(crop,crop_dis,crop_pro,crop_eco,crop_pes,crop_med,soil_data,reg
     elements.append(table2)
 
     # Add space between image/title and table
+    elements.append(Spacer(1, 20))
+    elements.append(Spacer(1, 20))
     elements.append(Spacer(1, 20))
     elements.append(Spacer(1, 20))
     elements.append(Spacer(1, 20))

@@ -1,4 +1,4 @@
-CREATE DATABASE  IF NOT EXISTS `krishimitra` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+CREATE DATABASE  IF NOT EXISTS `krishimitra` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `krishimitra`;
 -- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
 --
@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `_admin_`;
 CREATE TABLE `_admin_` (
   `admminname` varchar(100) DEFAULT NULL,
   `adminpassword` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -53,7 +53,7 @@ CREATE TABLE `crop` (
   `sowing_month` varchar(255) DEFAULT NULL,
   `soil_type` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`crop_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -93,7 +93,7 @@ CREATE TABLE `crop_diseases` (
   PRIMARY KEY (`diseases`),
   KEY `crop_name` (`crop_name`),
   CONSTRAINT `crop_diseases_ibfk_1` FOREIGN KEY (`crop_name`) REFERENCES `crop` (`crop_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,7 +120,7 @@ CREATE TABLE `crop_economics` (
   `avg_market_value_per_unit_area` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`crop_name`),
   CONSTRAINT `crop_economics_ibfk_1` FOREIGN KEY (`crop_name`) REFERENCES `crop` (`crop_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -146,7 +146,7 @@ CREATE TABLE `crop_medicines` (
   PRIMARY KEY (`medicine`),
   KEY `diseases` (`diseases`),
   CONSTRAINT `crop_medicines_ibfk_1` FOREIGN KEY (`diseases`) REFERENCES `crop_diseases` (`diseases`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -172,7 +172,7 @@ CREATE TABLE `crop_pesticides` (
   PRIMARY KEY (`pesticides`),
   KEY `pests` (`pests`),
   CONSTRAINT `crop_pesticides_ibfk_1` FOREIGN KEY (`pests`) REFERENCES `crop_pests` (`pests`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -198,7 +198,7 @@ CREATE TABLE `crop_pests` (
   PRIMARY KEY (`pests`),
   KEY `crop_name` (`crop_name`),
   CONSTRAINT `crop_pests_ibfk_1` FOREIGN KEY (`crop_name`) REFERENCES `crop` (`crop_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -241,7 +241,7 @@ CREATE TABLE `crop_properties` (
   `irrigation_type` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`crop_name`),
   CONSTRAINT `crop_properties_ibfk_1` FOREIGN KEY (`crop_name`) REFERENCES `crop` (`crop_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -264,7 +264,7 @@ DROP TABLE IF EXISTS `month_crop`;
 CREATE TABLE `month_crop` (
   `yeild_type` varchar(255) DEFAULT NULL,
   `sowing_month` varchar(255) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -288,7 +288,7 @@ CREATE TABLE `region` (
   `region_name` varchar(255) NOT NULL,
   `cost_per_unit_area` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`region_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -315,7 +315,7 @@ CREATE TABLE `region_soil` (
   KEY `soil_type` (`soil_type`),
   CONSTRAINT `region_soil_ibfk_1` FOREIGN KEY (`region_name`) REFERENCES `region` (`region_name`),
   CONSTRAINT `region_soil_ibfk_2` FOREIGN KEY (`soil_type`) REFERENCES `soil` (`soil_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -342,7 +342,7 @@ CREATE TABLE `region_water` (
   KEY `region_name` (`region_name`),
   CONSTRAINT `region_water_ibfk_1` FOREIGN KEY (`water_source`) REFERENCES `water` (`water_source`),
   CONSTRAINT `region_water_ibfk_2` FOREIGN KEY (`region_name`) REFERENCES `region` (`region_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -366,7 +366,7 @@ CREATE TABLE `soil` (
   `soil_type` varchar(255) NOT NULL,
   `water_holding_capacity` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`soil_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -393,7 +393,7 @@ CREATE TABLE `soil_crop` (
   KEY `soil_type` (`soil_type`),
   CONSTRAINT `soil_crop_ibfk_1` FOREIGN KEY (`crop_name`) REFERENCES `crop` (`crop_name`),
   CONSTRAINT `soil_crop_ibfk_2` FOREIGN KEY (`soil_type`) REFERENCES `soil_nutrition` (`soil_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -419,7 +419,7 @@ CREATE TABLE `soil_nutrition` (
   PRIMARY KEY (`nutrients`),
   KEY `soil_type` (`soil_type`),
   CONSTRAINT `soil_nutrition_ibfk_1` FOREIGN KEY (`soil_type`) REFERENCES `soil` (`soil_type`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -447,7 +447,7 @@ CREATE TABLE `user_records` (
   `soil` varchar(100) DEFAULT NULL,
   `month_` varchar(255) DEFAULT NULL,
   `crop` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -472,7 +472,7 @@ CREATE TABLE `users` (
   `password` varchar(300) NOT NULL,
   `email` varchar(50) NOT NULL,
   PRIMARY KEY (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -496,7 +496,7 @@ CREATE TABLE `water` (
   `water_source` varchar(255) NOT NULL,
   `availability` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`water_source`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -519,7 +519,7 @@ UNLOCK TABLES;
 /*!50001 SET @saved_col_connection     = @@collation_connection */;
 /*!50001 SET character_set_client      = utf8mb4 */;
 /*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 SET collation_connection      = utf8mb4_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
 /*!50001 VIEW `crop_all_month` AS select `t1`.`sowing_month` AS `sowing_month`,`t2`.`soil_type` AS `soil_type`,`t2`.`crop_name` AS `crop_name` from (`crop` `t1` join `soil_crop` `t2` on((`t1`.`crop_name` = `t2`.`crop_name`))) */;
@@ -537,7 +537,7 @@ UNLOCK TABLES;
 /*!50001 SET @saved_col_connection     = @@collation_connection */;
 /*!50001 SET character_set_client      = utf8mb4 */;
 /*!50001 SET character_set_results     = utf8mb4 */;
-/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 SET collation_connection      = utf8mb4_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
 /*!50001 VIEW `crop_pests_pesticides` AS select `t1`.`pests` AS `pests`,`t1`.`crop_name` AS `crop_name`,`t2`.`pesticides` AS `pesticides` from (`crop_pests` `t1` join `crop_pesticides` `t2` on((`t1`.`pests` = `t2`.`pests`))) */;

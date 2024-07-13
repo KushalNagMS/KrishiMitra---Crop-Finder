@@ -74,7 +74,7 @@ Short description or tagline of the project.
 
 Contributors:  
     NamishM7 -- https://github.com/NamishM7,  
-    KushalNagMS -- https://github.com/KushalNagMS1
+    Lakshmish0 -- https://github.com/Lakshmish0
 
 
 ## License
